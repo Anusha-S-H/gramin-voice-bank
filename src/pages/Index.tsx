@@ -1,11 +1,47 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { BalanceCard } from "@/components/BalanceCard";
 import { QuickActions } from "@/components/QuickActions";
 import { TransactionList } from "@/components/TransactionList";
 import { SavingsCard } from "@/components/SavingsCard";
 import { LoanRecommendations } from "@/components/LoanRecommendations";
+import { VoiceAssistant } from "@/components/VoiceAssistant";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Index = () => {
+  const [user, setUser] = useState<any>(null);
+  const [userName, setUserName] = useState("User");
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const language = useLanguage();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (!session) {
+        navigate('/auth');
+      } else {
+        setUserName(session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User');
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (!session) {
+        navigate('/auth');
+      } else {
+        setUserName(session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  if (!user) return null;
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -14,10 +50,10 @@ const Index = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">
-            Welcome back, <span className="gradient-text">Ramesh Kumar</span>
+            {t('welcomeBack')}, <span className="gradient-text">{userName}</span>
           </h2>
           <p className="text-muted-foreground">
-            Here's what's happening with your money today
+            {t('happeningToday')}
           </p>
         </div>
 
@@ -40,10 +76,12 @@ const Index = () => {
         {/* Footer Note */}
         <div className="mt-12 text-center">
           <p className="text-sm text-muted-foreground">
-            Your security is our priority. All transactions are encrypted and secure.
+            {t('securityNote')}
           </p>
         </div>
       </main>
+
+      <VoiceAssistant language={language} />
     </div>
   );
 };
