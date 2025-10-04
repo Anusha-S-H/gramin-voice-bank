@@ -14,7 +14,136 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accounts: {
+        Row: {
+          account_number: string
+          account_type: string
+          balance: number
+          created_at: string
+          id: string
+          savings_goal: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_number: string
+          account_type?: string
+          balance?: number
+          created_at?: string
+          id?: string
+          savings_goal?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_number?: string
+          account_type?: string
+          balance?: number
+          created_at?: string
+          id?: string
+          savings_goal?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cheques: {
+        Row: {
+          account_id: string
+          amount: number
+          cheque_date: string | null
+          cheque_number: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          notes: string | null
+          payee_name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          cheque_date?: string | null
+          cheque_number?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          notes?: string | null
+          payee_name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          cheque_date?: string | null
+          cheque_number?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          notes?: string | null
+          payee_name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cheques_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          category: string | null
+          counterparty_account: string | null
+          counterparty_name: string | null
+          created_at: string
+          description: string
+          id: string
+          status: string
+          type: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          category?: string | null
+          counterparty_account?: string | null
+          counterparty_name?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          status?: string
+          type: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          category?: string | null
+          counterparty_account?: string | null
+          counterparty_name?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
